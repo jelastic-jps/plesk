@@ -1,0 +1,37 @@
+{
+  "jpsType": "install",
+  "jpsVersion": "0.8",
+  "application": {
+    "name": "Plesk Panel",
+    "homepage": "https://www.plesk.com/",
+    "description": "Plesk Panel",
+    "version": "1.0",
+    "logo": "https://www.plesk.com/wp-content/themes/plesk/assets/logo.png",
+    "env": {
+      "topology": {
+        "nodes": [
+          {
+            "cloudlets": 6,
+            "extip": true,
+            "nodeGroup": "cp",
+            "docker": {
+              "image": "plesk/plesk:preview"
+            }
+          }
+        ]
+      }
+    },
+    "onInstall": [
+      {
+        "execCmd": {
+          "nodeGroup": "cp",
+              "commands": [
+                "iptables -t nat -I PREROUTING -p tcp --dport 7443 -j REDIRECT --to-port 8443",
+                "/etc/init.d/iptables-persistent save",
+                "sed -i 's/8443/7443/g'  /var/www/vhosts/example.dom/httpdocs/index.html"
+            ]
+        }
+      }
+    ]
+  }
+}
