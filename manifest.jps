@@ -33,5 +33,9 @@
         }
       }
     ]
+    "success": {
+		"text": "Plesk panel is installed. Default credentials are: admin/changeme",
+		"email": "Plesk panel is installed. Default credentials are: admin/changeme "
+    }
   }
 }
