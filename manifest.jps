@@ -4,7 +4,7 @@
   "application": {
     "name": "Plesk Panel",
     "homepage": "https://www.plesk.com/",
-    "description": "Plesk Panel",
+    "description": "Plesk is a web hosting platform.",
     "version": "1.0",
     "logo": "https://www.plesk.com/wp-content/themes/plesk/assets/logo.png",
     "env": {
