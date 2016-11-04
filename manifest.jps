@@ -21,18 +21,6 @@
         ]
       }
     },
-    "onInstall": [
-      {
-        "execCmd": {
-          "nodeGroup": "cp",
-              "commands": [
-                "iptables -t nat -I PREROUTING -p tcp --dport 7443 -j REDIRECT --to-port 8443",
-                "/etc/init.d/iptables-persistent save",
-                "sed -i 's/8443/7443/g'  /var/www/vhosts/example.dom/httpdocs/index.html"
-            ]
-        }
-      }
-    ],
     "success": {
 	"email": "Plesk panel has been installed successfully. Default credentials are: <b>admin/changeme</b>"
     }
