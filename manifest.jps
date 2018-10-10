@@ -12,7 +12,7 @@
         "nodes": [
           {
             "cloudlets": 6,
-            "extip": true,
+            "extip": false,
             "nodeGroup": "cp",
             "docker": {
               "image": "plesk/plesk:preview"
