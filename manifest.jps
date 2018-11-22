@@ -6,7 +6,7 @@
     "homepage": "https://www.plesk.com/",
     "description": "Plesk is a web hosting platform.",
     "version": "1.0",
-    "logo": "https://www.plesk.com/wp-content/themes/plesk/assets/logo.png",
+    "logo": "https://raw.githubusercontent.com/jelastic-jps/plesk/master/images/plesk.png",
     "env": {
       "topology": {
         "nodes": [
