@@ -1,5 +1,5 @@
 <p align="left">
-<img border="1" src="images/plesk.png" width="100">
+<img border="1" src="images/plesk-logo-readme.png" width="100">
 </p>
 
 # Plesk Control Panel
