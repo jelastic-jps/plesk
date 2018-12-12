@@ -1,28 +1,53 @@
-{
-  "jpsType": "install",
-  "jpsVersion": "0.8",
-  "application": {
-    "name": "Plesk Panel",
-    "homepage": "https://www.plesk.com/",
-    "description": "Plesk is a web hosting platform.",
-    "version": "1.0",
-    "logo": "https://raw.githubusercontent.com/jelastic-jps/plesk/master/images/plesk.png",
-    "env": {
-      "topology": {
-        "nodes": [
-          {
-            "cloudlets": 6,
-            "extip": false,
-            "nodeGroup": "cp",
-            "docker": {
-              "image": "plesk/plesk:preview"
-            }
-          }
-        ]
-      }
-    },
-    "success": {
-	"email": "Plesk panel has been installed successfully. Default credentials are: <b>admin/changeme</b>"
-    }
+type: install
+version: '1.0'
+name: Plesk Hosting Platform
+homepage: https://www.plesk.com/
+
+onBeforeInit: |
+  var extip = false, resp;
+  resp = jelastic.billing.account.GetQuotas(appid, session, [
+    'environment.externalip.enabled',
+    'environment.externalip.maxcount',
+    'environment.externalip.maxcount.per.node'].join(";")
+  );
+  if (resp.result != 0) return resp;
+  
+  if (resp.array[0].value && resp.array[1].value && resp.array[2].value) {
+    extip = true;
   }
-}
+  
+  return {result:0, globals: {
+    extip: !!extip
+  }};
+
+categories:
+ - apps/dev-and-admin-tools
+ - apps/other
+
+description:
+  text: Plesk is a powerful commercial web hosting platform that provides a complete
+    set of technical, security and automation tools to simplify running and managing
+    web applications. Easily get started with this platform having it automatically
+    installed and pre-configured within Jelastic.
+  short: Web hosting platform with complete set of technical, security and automation
+    tools
+logo: https://raw.githubusercontent.com/jelastic-jps/plesk/master/images/plesk.png
+
+globals:
+  ADMIN_PASS: "${fn.password}"
+  extip: 'false'
+  
+nodes:
+- cloudlets: 16
+  nodeGroup: cp
+  extip: ${globals.extip}
+  docker:
+    image: plesk/plesk:preview
+
+onInstall:
+- cmd [cp]: plesk bin admin --set-admin-password -passwd '${globals.ADMIN_PASS}'
+- cmd [cp]: sed -i 's|#log_bin.*|log_bin = /var/log/mysql/mariadb-bin\nlog_bin_index = /var/log/mysql/mariadb-bin.inde|g' /etc/mysql/my.cnf; service mysql restart
+- cmd [cp]: if [ -f /usr/local/psa/var/maintenance/status.json ]; then { rm -rf /usr/local/psa/var/maintenance/status.json; sed -i "s|maintenance .*|maintenance off;|g" /etc/sw-cp-server/conf.d/maintenance; service sw-cp-server restart; }; else echo 2; fi
+
+success: 'Below you will find your admin panel link, username and password.</br></br><table style=''font-size:13px; border: none;''><tr><td>Admin panel URL:</td><td style=''padding-left: 10px;''><a href=''https://${env.domain}:8443'' target=''_blank''>https://${env.domain}:8443</a></td></tr>  <tr><td>Admin name:</td><td style=''padding-left: 10px;''>admin</td></tr><tr><td>Password:</td><td style=''padding-left: 10px;''>${globals.ADMIN_PASS}</td></tr></table></br>To add custom domain name for your Plesk installation follow the steps described in our <a href=''http://docs.jelastic.com/custom-domains'' target=''_blank''>documentation</a>'
+startPage: https://${env.domain}:8443
