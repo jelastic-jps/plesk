@@ -22,7 +22,6 @@ onBeforeInit: |
 
 categories:
  - apps/dev-and-admin-tools
- - apps/other
 
 description:
   text: Plesk is a powerful commercial web hosting platform that provides a complete
