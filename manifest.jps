@@ -17,7 +17,8 @@ onBeforeInit: |
   }
   
   return {result:0, globals: {
-    extip: !!extip
+    extip: !!extip,
+    ADMIN_PASS: "${fn.password}"
   }};
 
 categories:
@@ -31,10 +32,6 @@ description:
   short: Web hosting platform with complete set of technical, security and automation
     tools
 logo: https://raw.githubusercontent.com/jelastic-jps/plesk/master/images/plesk.png
-
-globals:
-  ADMIN_PASS: "${fn.password}"
-  extip: 'false'
   
 nodes:
 - cloudlets: 16
@@ -44,7 +41,7 @@ nodes:
     image: plesk/plesk:preview
 
 onInstall:
-- cmd [cp]: plesk bin admin --set-admin-password -passwd '${globals.ADMIN_PASS}'
+- cmd [cp]: plesk bin admin --set-admin-password -passwd "${globals.ADMIN_PASS}"
 - cmd [cp]: sed -i 's|#log_bin.*|log_bin = /var/log/mysql/mariadb-bin\nlog_bin_index = /var/log/mysql/mariadb-bin.inde|g' /etc/mysql/my.cnf; service mysql restart
 - cmd [cp]: if [ -f /usr/local/psa/var/maintenance/status.json ]; then { rm -rf /usr/local/psa/var/maintenance/status.json; sed -i "s|maintenance .*|maintenance off;|g" /etc/sw-cp-server/conf.d/maintenance; service sw-cp-server restart; }; else echo 2; fi
 
