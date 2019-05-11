@@ -16,10 +16,31 @@ onBeforeInit: |
     extip = true;
   }
   
-  return {result:0, globals: {
-    extip: !!extip,
-    ADMIN_PASS: "${fn.password}"
-  }};
+  var url = "https://registry.hub.docker.com/v1/repositories/plesk/plesk/tags";
+  var tags = toNative(new com.hivext.api.core.utils.Transport().get(url)).sort();
+  var ver = {},
+      def = "";
+  for (var i = 0; i < tags.length; i++) {
+      ver[tags[i].name] = tags[i].name;
+      if (!isNaN(tags[i].name) && tags[i].name > def) def = tags[i].name;
+  }
+  
+  return {
+    result:0, 
+    globals: {
+      extip: !!extip,
+      passwd: "${fn.password}"
+    }, 
+    settings: {
+      fields: [{
+          name: "version",
+          caption: "Plesk Version",
+          type: "list",
+          values: ver,
+          "default": def
+      }]    
+    }
+  };
 
 categories:
  - apps/dev-and-admin-tools
@@ -41,9 +62,16 @@ nodes:
     image: plesk/plesk:preview
 
 onInstall:
-- cmd [cp]: plesk bin admin --set-admin-password -passwd "${globals.ADMIN_PASS}"
-- cmd [cp]: sed -i 's|#log_bin.*|log_bin = /var/log/mysql/mariadb-bin\nlog_bin_index = /var/log/mysql/mariadb-bin.inde|g' /etc/mysql/my.cnf; service mysql restart
-- cmd [cp]: if [ -f /usr/local/psa/var/maintenance/status.json ]; then { rm -rf /usr/local/psa/var/maintenance/status.json; sed -i "s|maintenance .*|maintenance off;|g" /etc/sw-cp-server/conf.d/maintenance; service sw-cp-server restart; }; else echo 2; fi
+  cmd[cp]: |-
+    plesk bin admin --set-admin-password -passwd "${globals.passwd}"
+    sed -i 's|#log_bin.*|log_bin = /var/log/mysql/mariadb-bin\nlog_bin_index = /var/log/mysql/mariadb-bin.inde|g' /etc/mysql/my.cnf; service mysql restart
+    if [ -f /usr/local/psa/var/maintenance/status.json ]; then { rm -rf /usr/local/psa/var/maintenance/status.json; sed -i "s|maintenance .*|maintenance off;|g" /etc/sw-cp-server/conf.d/maintenance; service sw-cp-server restart; }; else echo 2; fi
 
-success: 'Below you will find your admin panel link, username and password.</br></br><table style=''font-size:13px; border: none;''><tr><td>Admin panel URL:</td><td style=''padding-left: 10px;''><a href=''https://${env.domain}:8443'' target=''_blank''>https://${env.domain}:8443</a></td></tr>  <tr><td>Admin name:</td><td style=''padding-left: 10px;''>admin</td></tr><tr><td>Password:</td><td style=''padding-left: 10px;''>${globals.ADMIN_PASS}</td></tr></table></br>To add custom domain name for your Plesk installation follow the steps described in our <a href=''http://docs.jelastic.com/custom-domains'' target=''_blank''>documentation</a>'
+success: |
+  *Admin URL*: [https://${env.domain}:8443](https://${env.domain}:8443)  
+  *Login*: admin  
+  *Password*: ${globals.passwd}  
+  
+  To add custom domain name for your Plesk installation follow the steps described in our [documentation](http://docs.jelastic.com/custom-domains)
+  
 startPage: https://${env.domain}:8443
