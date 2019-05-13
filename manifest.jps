@@ -62,10 +62,11 @@ nodes:
     image: plesk/plesk:preview
 
 onInstall:
-  cmd[cp]: |-
-    plesk bin admin --set-admin-password -passwd "${globals.passwd}"
-    sed -i 's|#log_bin.*|log_bin = /var/log/mysql/mariadb-bin\nlog_bin_index = /var/log/mysql/mariadb-bin.inde|g' /etc/mysql/my.cnf; service mysql restart
-    if [ -f /usr/local/psa/var/maintenance/status.json ]; then { rm -rf /usr/local/psa/var/maintenance/status.json; sed -i "s|maintenance .*|maintenance off;|g" /etc/sw-cp-server/conf.d/maintenance; service sw-cp-server restart; }; else echo 2; fi
+  - cmd[cp]: while [ "$(pgrep nginx)" == "" ];do sleep 2; done; sleep 10;
+  - cmd[cp]:
+    - sed -i 's|#log_bin.*|log_bin = /var/log/mysql/mariadb-bin\nlog_bin_index = /var/log/mysql/mariadb-bin.inde|g' /etc/mysql/my.cnf; service mysql restart
+    - if [ -f /usr/local/psa/var/maintenance/status.json ]; then { rm -rf /usr/local/psa/var/maintenance/status.json; sed -i "s|maintenance .*|maintenance off;|g" /etc/sw-cp-server/conf.d/maintenance; service sw-cp-server restart; }; else echo 2; fi
+    - plesk bin admin --set-admin-password -passwd "${globals.passwd}"
 
 success: |
   *Admin URL*: [https://${env.domain}:8443](https://${env.domain}:8443)  
