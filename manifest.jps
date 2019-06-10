@@ -71,7 +71,7 @@ onInstall:
 
 success: |
   **Admin URL:** [https://${env.domain}:8443](https://${env.domain}:8443)  
-  **Login:** admin  
+  **Login:** admin   
   **Password:** ${globals.passwd}  
   
   To add custom domain name for your Plesk installation follow the steps described in our [documentation](http://docs.jelastic.com/custom-domains)
