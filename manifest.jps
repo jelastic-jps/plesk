@@ -61,6 +61,9 @@ nodes:
   docker:
     image: plesk/plesk:preview
 
+onBeforeInstall:
+  - cmd[cp]:  chmod 4510 /opt/psa/admin/sbin/wrapper
+  
 onInstall:
   - cmd[cp]: while [ "$(pgrep nginx)" == "" ];do sleep 2; done; sleep 10;
   - cmd[cp]:
