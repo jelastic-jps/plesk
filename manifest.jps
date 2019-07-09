@@ -1,4 +1,5 @@
 type: install
+id: plesk
 version: '1.0'
 name: Plesk Hosting Platform
 homepage: https://www.plesk.com/
