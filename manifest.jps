@@ -60,10 +60,18 @@ nodes:
   nodeGroup: cp
   extip: ${globals.extip}
   docker:
-    image: plesk/plesk:preview
+    image: plesk/plesk:${settings.version}
 
 onInstall:
+  - if ('${globals.extip}' == 'true' ):
+    - setGlobals:
+        front-ip: ${nodes.cp[0].extIPs}
+  - if ('${globals.extip}' == 'fase' ):
+    - setGlobals:
+        front-ip: ${nodes.cp[0].intIP}
+
   - cmd[cp]: chmod 4510 /opt/psa/admin/sbin/wrapper
+  - cmd[cp]: sed -i -e 's/[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}/${globals.front-ip}/g'  /etc/nginx/plesk.conf.d/server.conf; service nginx restart
   - cmd[cp]: while [ "$(pgrep nginx)" == "" ];do sleep 2; done; sleep 10;
   - cmd[cp]:
     - while true; do plesk bin cloning --status && break ; done
