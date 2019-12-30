@@ -66,7 +66,7 @@ onInstall:
   - if ('${globals.extip}' == 'true' ):
     - setGlobals:
         front-ip: ${nodes.cp[0].extIPs}
-  - if ('${globals.extip}' == 'fase' ):
+  - if ('${globals.extip}' == 'false' ):
     - setGlobals:
         front-ip: ${nodes.cp[0].intIP}
 
