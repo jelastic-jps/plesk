@@ -53,7 +53,7 @@ nodes:
   nodeGroup: cp
   extip: ${globals.extip}
   docker:
-    image: ihorman/plesk:${settings.version}
+    image: plesk/plesk:${settings.version}
 onInstall:
   - if ('${globals.extip}' == 'true' ):
     - setGlobals:
