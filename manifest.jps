@@ -19,6 +19,7 @@ onBeforeInit: |
   var ver = {},
       def = "";
   for (var i = 0; i < tags.length; i++) {
+      if (parseInt(tags[i].name) < 18) continue;
       ver[tags[i].name] = tags[i].name;
       if (!isNaN(tags[i].name) && tags[i].name > def) def = tags[i].name;
   }
