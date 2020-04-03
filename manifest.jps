@@ -64,7 +64,7 @@ onInstall:
         front-ip: ${nodes.cp[0].intIP}
   - cmd[cp]: |-
       chmod 4510 /opt/psa/admin/sbin/wrapper
-      sed -i 's|mesg n \|\| true|if `tty -s`;then\n   mesg n\nfi|g' /root/.profile
+      sed -i '/mesg/d' /root/.profile
       sed -i -e 's/[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}/${globals.front-ip}/g'  /etc/nginx/plesk.conf.d/server.conf;
       cert_file=$(ls -1 /opt/psa/var/certificates/cert* | awk '{ print $1 }')
       mkdir -p /var/tmp; chmod 777 -R /var/tmp
