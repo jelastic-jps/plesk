@@ -1,5 +1,3 @@
-tags:
+templates:
   plesk:
-    plesk:
-      digest: sha256:0c4a7c5d1c091cfee52d26b5cbd10c1a276aaaf4354d2e394e4620a6f63fc975
-      version: latest
+    - ^plesk
