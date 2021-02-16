@@ -58,7 +58,6 @@ nodes:
     startServiceOnCreation: false
   
 onInstall:
-  - cmd[cp]: service mysql restart
   - if ('${globals.extip}' == 'true' ):
     - setGlobals:
         front-ip: ${nodes.cp[0].extIPs}
@@ -72,6 +71,7 @@ onInstall:
       systemctl stop nginx;
       pkill -9 sw-cp-serverd;
       sed -i 's|#log_bin.*|log_bin = /var/log/mysql/mariadb-bin\nlog_bin_index = /var/log/mysql/mariadb-bin.index|g' /etc/mysql/my.cnf; 
+      systemctl restart mysql;
       chmod 4510 /opt/psa/admin/sbin/wrapper
       sed -i -e 's/[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}/${globals.front-ip}/g'  /etc/nginx/plesk.conf.d/server.conf;
       mkdir -p /var/tmp; chmod 777 -R /var/tmp  
