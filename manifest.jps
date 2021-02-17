@@ -64,7 +64,6 @@ onInstall:
   - if ('${globals.extip}' == 'false' ):    
     - setGlobals:
         front-ip: ${nodes.cp[0].intIP}
-  - cmd[cp]: service mysql restart
   - cmd[cp]: |-
       echo > /usr/bin/mesg > /dev/null 2>&1; chmod +x /usr/bin/mesg > /dev/null 2>&1
       update-rc.d nginx remove > /dev/null 2>&1
