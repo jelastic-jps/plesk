@@ -68,10 +68,10 @@ onInstall:
       echo > /usr/bin/mesg > /dev/null 2>&1; chmod +x /usr/bin/mesg > /dev/null 2>&1
       update-rc.d nginx remove > /dev/null 2>&1
       sed -i 's/yes/no/g' /etc/default/nginx
-      systemctl stop nginx;
+      killall apache2
       pkill -9 sw-cp-serverd;
       sed -i 's|#log_bin.*|log_bin = /var/log/mysql/mariadb-bin\nlog_bin_index = /var/log/mysql/mariadb-bin.index|g' /etc/mysql/my.cnf; 
-      systemctl restart mysql;
+      systemctl status mysql | grep active && systemctl restart mysql;
       chmod 4510 /opt/psa/admin/sbin/wrapper
       sed -i -e 's/[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}/${globals.front-ip}/g'  /etc/nginx/plesk.conf.d/server.conf;
       mkdir -p /var/tmp; chmod 777 -R /var/tmp  
@@ -84,8 +84,11 @@ onInstall:
       sed -i 's/no/yes/g' /etc/default/nginx;
       cert=$(ls /opt/psa/var/certificates)
       sed -i 's|certificates\/.*\"|certificates\/'$cert'\"|g' /etc/nginx/plesk.conf.d/server.conf
-      systemctl restart nginx;
-      echo "Reconfiguration Compleated"
+      while [[ $(ps uax | grep "nginx:" | grep -v grep | wc -l) = 0 ]]; do sleep 2; done
+      killall nginx
+      yes | (plesk repair web)
+      while [[ $(ps uax | grep "nginx:" | grep -v grep | wc -l) = 0 ]]; do sleep 2; done
+      plesk sbin nginxmng -e
       
 success: |
   **Admin URL:** [https://${env.domain}:8443](https://${env.domain}:8443)   
