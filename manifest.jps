@@ -67,7 +67,6 @@ onInstall:
   - cmd[cp]: |-
       chmod +x /usr/sbin/mysqld
       find /var/lib/mysql -type f -exec touch {} \; && service mysql stop
-      pkill -9 sw-cp-serverd;
       sed -i -e 's/[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}/${globals.front-ip}/g'  /etc/nginx/plesk.conf.d/server.conf;
       cert=$(ls /opt/psa/var/certificates)
       sed -i 's|certificates\/.*\"|certificates\/'$cert'\"|g' /etc/nginx/plesk.conf.d/server.conf
