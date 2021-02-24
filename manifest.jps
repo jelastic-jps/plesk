@@ -77,10 +77,12 @@ onInstall:
       while [ $(plesk bin cloning --status) -ne 0 ]; do sleep 5; done
       while [[ $(ps uax | grep "plesk log" | grep -v grep | wc -l) = 0 ]] ; do sleep 2; done
       plesk bin admin --set-admin-password -passwd "${globals.passwd}"
+      iptables -t nat -I PREROUTING -p tcp -m tcp --dport 443 -j REDIRECT --to-ports 8443
+      iptables-save
       
 success: |
-  **Admin URL:** [https://${env.domain}:8443](https://${env.domain}:8443)   
+  **Admin URL:** [https://${env.domain}](https://${env.domain})   
   **Login:** admin   
   **Password:** ${globals.passwd}  
   To add custom domain name for your Plesk installation follow the steps described in our [documentation](http://docs.jelastic.com/custom-domains)
-startPage: https://${env.domain}:8443
+startPage: https://${env.domain}
