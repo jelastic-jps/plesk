@@ -53,43 +53,36 @@ nodes:
 - cloudlets: 16
   nodeGroup: cp
   extip: ${globals.extip}
-  docker:
-    image: plesk/plesk:${settings.version}
-    startServiceOnCreation: false
-  
+  image: plesk/plesk:${settings.version}
+  startServiceOnCreation: false
+
 onInstall:
   - if ('${globals.extip}' == 'true' ):
     - setGlobals:
         front-ip: ${nodes.cp[0].extIPs}
-  - if ('${globals.extip}' == 'false' ):    
+  - else:    
     - setGlobals:
         front-ip: ${nodes.cp[0].intIP}
-  - cmd[cp]: |-
-      echo > /usr/bin/mesg > /dev/null 2>&1; chmod +x /usr/bin/mesg > /dev/null 2>&1
-      update-rc.d nginx remove > /dev/null 2>&1
-      sed -i 's/yes/no/g' /etc/default/nginx
-      systemctl stop nginx;
-      pkill -9 sw-cp-serverd;
-      sed -i 's|#log_bin.*|log_bin = /var/log/mysql/mariadb-bin\nlog_bin_index = /var/log/mysql/mariadb-bin.index|g' /etc/mysql/my.cnf; 
-      systemctl restart mysql;
-      chmod 4510 /opt/psa/admin/sbin/wrapper
-      sed -i -e 's/[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}/${globals.front-ip}/g'  /etc/nginx/plesk.conf.d/server.conf;
-      mkdir -p /var/tmp; chmod 777 -R /var/tmp  
-      find /var/log/plesk/ -name "*.log" -type f -exec cp /dev/null {} \;
 
-  - cmd[cp]: |-    
-      while [ $(plesk bin cloning --status) -ne 0 ]; do sleep 5; done
-      if [ -f /usr/local/psa/var/maintenance/status.json ]; then { rm -rf /usr/local/psa/var/maintenance/status.json; sed -i "s|maintenance .*|maintenance off;|g" /etc/sw-cp-server/conf.d/maintenance; service sw-engine restart; }; else echo 2; fi
-      plesk bin admin --set-admin-password -passwd "${globals.passwd}";
-      sed -i 's/no/yes/g' /etc/default/nginx;
+  - cmd[cp]: |-
+      chmod +x /usr/sbin/mysqld
+      find /var/lib/mysql -type f -exec touch {} \; && service mysql stop
+      sed -i -e 's/[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}/${globals.front-ip}/g'  /etc/nginx/plesk.conf.d/server.conf;
       cert=$(ls /opt/psa/var/certificates)
       sed -i 's|certificates\/.*\"|certificates\/'$cert'\"|g' /etc/nginx/plesk.conf.d/server.conf
-      systemctl restart nginx;
-      echo "Reconfiguration Compleated"
+
+  - env.control.ExecDockerRunCmd [${nodes.cp.join(id,)}]
+
+  - cmd [cp]: |-
+      while [ $(plesk bin cloning --status) -ne 0 ]; do sleep 5; done
+      while [[ $(ps uax | grep "plesk log" | grep -v grep | wc -l) = 0 ]] ; do sleep 2; done
+      plesk bin admin --set-admin-password -passwd "${globals.passwd}"
+      iptables -t nat -I PREROUTING -p tcp -m tcp --dport 443 -j REDIRECT --to-ports 8443
+      iptables-save
       
 success: |
-  **Admin URL:** [https://${env.domain}:8443](https://${env.domain}:8443)   
+  **Admin URL:** [https://${env.domain}](https://${env.domain})   
   **Login:** admin   
   **Password:** ${globals.passwd}  
   To add custom domain name for your Plesk installation follow the steps described in our [documentation](http://docs.jelastic.com/custom-domains)
-startPage: https://${env.domain}:8443
+startPage: https://${env.domain}
