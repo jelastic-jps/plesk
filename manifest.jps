@@ -77,6 +77,7 @@ onInstall:
   - cmd [cp]: |-
       while [ $(plesk bin cloning --status) -ne 0 ]; do sleep 5; done
       while [[ $(ps uax | grep "plesk" | grep -v grep | wc -l) = 0 ]] ; do sleep 2; done
+      service mysql status || service mysql start
       plesk bin admin --set-admin-password -passwd "${globals.passwd}"
       iptables -t nat -I PREROUTING -p tcp -m tcp --dport 443 -j REDIRECT --to-ports 8443
       iptables-save
