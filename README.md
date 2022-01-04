@@ -10,7 +10,7 @@ Plesk is a powerful commercial WebOps hosting platform that allows you to easily
 
 Click the **Deploy** button below, specify your email address within the widget, choose one of the [Jelastic Public Cloud providers](https://jelastic.com/install-application/?manifest=https://raw.githubusercontent.com/jelastic-jps/plesk/master/manifest.jps) and press **Install**.
 
-[![Deploy](images/deploy-to-jelastic.png)](https://jelastic.com/install-application/?manifest=https://raw.githubusercontent.com/jelastic-jps/plesk/master/manifest.jps)
+[![Deploy](https://jelastic.com/getithosted/button.png)](https://jelastic.com/install-application/?manifest=https://raw.githubusercontent.com/jelastic-jps/plesk/master/manifest.jps)
 
 If you have already the account, you can import the link of the application manifest within Jelastic PaaS dashboard or initiate installation from **Marketplace > Dev & Admin Tools > Plesk Panel**
 
