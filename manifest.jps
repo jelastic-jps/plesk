@@ -75,7 +75,8 @@ onInstall:
   - env.control.ExecDockerRunCmd [${nodes.cp.join(id,)}]
 
   - cmd [cp]: |-
-      while [ $(plesk bin cloning --status) -ne 0 ]; do sleep 5; done
+      result=$(timeout 300 bash -c 'while [ $(plesk bin cloning --status) -ne 0 ]; do sleep 5; done; echo 0;')
+      [[ -z "$result" ]] && { plesk bin cloning -u -prepare-public-image false; }
       while [[ $(ps uax | grep "plesk" | grep -v grep | wc -l) = 0 ]] ; do sleep 2; done
       service mysql status || service mysql start
       plesk bin admin --set-admin-password -passwd "${globals.passwd}"
