@@ -4,6 +4,16 @@ version: '1.0'
 name: Plesk Hosting Platform
 homepage: https://www.plesk.com/
 onBeforeInit: |
+  import org.apache.commons.httpclient.HttpClient;
+  import org.apache.commons.httpclient.methods.GetMethod;
+
+  var client = new HttpClient(),
+      getMethod,
+      response,
+      status,
+      resp,
+      url;
+      
   var extip = false, resp;
   resp = jelastic.billing.account.GetQuotas(appid, session, [
     'environment.externalip.enabled',
@@ -14,8 +24,13 @@ onBeforeInit: |
   if (resp.array[0].value && resp.array[1].value && resp.array[2].value) {
     extip = true;
   }
-  var url = "https://registry.hub.docker.com/v1/repositories/plesk/plesk/tags";
-  var tags = toNative(new com.hivext.api.core.utils.Transport().get(url)).sort();
+  var url = "https://registry.hub.docker.com/v2/repositories/plesk/plesk/tags";
+  getMethod = new GetMethod(url);
+  status = client.executeMethod(getMethod);
+  resp = getMethod.getResponseBodyAsString();
+  resp = JSON.parse(resp);
+  tags = resp.results;
+  
   var ver = {},
       def = "";
   for (var i = 0; i < tags.length; i++) {
