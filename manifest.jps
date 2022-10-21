@@ -97,6 +97,8 @@ onInstall:
       plesk bin admin --set-admin-password -passwd "${globals.passwd}"
       iptables -t nat -I PREROUTING -p tcp -m tcp --dport 443 -j REDIRECT --to-ports 8443
       iptables-save
+      plesk bin ipmanage -r ${nodes.cp[0].intIP}
+      plesk bin ipmanage --reread
       
 success: |
   **Admin URL:** [https://${env.domain}](https://${env.domain})   
